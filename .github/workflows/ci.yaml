@@ -1,0 +1,34 @@
+name: CI
+#on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:    
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - uses: actions/setup-node@v3
+          with:
+            node-version: 18
+        - uses: browser-actions/setup-chrome@v1
+          with:
+            chrome-version: 106
+            install-chromedriver: true    
+        - name: Install
+          run: |
+               npm install
+               /usr/bin/google-chrome --version
+        - name: Test
+          run: npm run wdio
+          continue-on-error: true
+        - uses: actions/upload-artifact@v3
+          with:
+            name: allureReport
+            path: ./reports/allure/allure-report
